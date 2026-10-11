@@ -2157,3 +2157,157 @@ a:focus-visible { outline-color: #e3c3ff; }
   filter: drop-shadow(0 5px 12px #000a);
   transform: translateZ(22px) scale(1.08);
 }
+
+/* ============================================================
+   360-DEGREE INTERACTIVE 3D & NEO GLASS EXTENSIONS
+   ============================================================ */
+
+.profile-card-container {
+  position: relative;
+  perspective: 1200px;
+  transform-style: preserve-3d;
+}
+
+.profile-card-3d-wrapper {
+  transform-style: preserve-3d;
+  transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+  user-select: none;
+}
+
+.profile-card-3d-wrapper.is-dragging {
+  cursor: grabbing !important;
+  transition: none !important;
+}
+
+.profile-card.liquid-glass-card {
+  transform-style: preserve-3d;
+  cursor: grab;
+  position: relative;
+}
+
+.profile-card.liquid-glass-card:active {
+  cursor: grabbing;
+}
+
+.rotation-reset-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 15;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(18, 14, 25, 0.65);
+  backdrop-filter: blur(8px);
+  color: #dfceec;
+  font-size: 11px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: all 160ms ease;
+}
+
+.rotation-reset-button:hover {
+  opacity: 1;
+  border-color: #bd85ff;
+  color: white;
+  transform: scale(1.1);
+}
+
+.rotation-indicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 8.5px;
+  letter-spacing: 1px;
+  color: rgba(220, 195, 245, 0.65);
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+/* Contact & About Section */
+.contact-section {
+  padding-bottom: 80px;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 24px;
+  margin-top: 18px;
+}
+
+@media (max-width: 820px) {
+  .contact-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.contact-card {
+  padding: 28px;
+  border-radius: 12px;
+  border: 1px solid rgba(231, 214, 255, 0.14);
+  background: linear-gradient(145deg, rgba(27, 21, 37, 0.92), rgba(12, 10, 17, 0.93));
+  backdrop-filter: blur(14px) saturate(130%);
+  display: grid;
+  gap: 16px;
+}
+
+.contact-bio {
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: #e5dbed;
+  margin: 0;
+}
+
+.interest-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.interest-tag {
+  padding: 5px 11px;
+  border-radius: 16px;
+  border: 1px solid rgba(224, 185, 255, 0.2);
+  background: rgba(162, 99, 218, 0.1);
+  color: #dfcded;
+  font-size: 11.5px;
+}
+
+.contact-channels {
+  display: grid;
+  gap: 12px;
+}
+
+.contact-channel-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.025);
+  transition: all 160ms ease;
+  color: #f0e6f6;
+  font-size: 12.5px;
+}
+
+.contact-channel-item:hover {
+  border-color: rgba(218, 168, 255, 0.5);
+  background: rgba(175, 115, 230, 0.12);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.contact-channel-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
