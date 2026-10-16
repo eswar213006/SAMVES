@@ -18,7 +18,7 @@ import {
   Medal,
   Menu,
   Pencil,
-  RotateCcw,
+
   ShieldCheck,
   Sparkles,
   Trash2,
@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 
 import { initialProfiles, profileThemes } from "./data/profiles.js";
-import { summaries } from "./data/summaries.js";
+import { summaries, heroConfig } from "./data/summaries.js";
 import { projectCategories, projects as initialProjects } from "./data/projects.js";
 import { codingPlatforms as initialCodingPlatforms } from "./data/codingJourney.js";
 import { resumes as initialResumes } from "./data/resumes.js";
@@ -141,10 +141,9 @@ function LiquidGlassCard({
 }
 
 // -------------------------------------------------------------
-// 360-DEGREE INTERACTIVE ROTATABLE 3D PROFILE CARD
-// Click-and-drag full 360° multi-axis rotation with inertia & reset
+// PROFILE CARD (simple, no 360° rotation)
 // -------------------------------------------------------------
-function RotatableProfileCard({
+function ProfileCard({
   profile,
   index,
   isSelected,
@@ -154,156 +153,81 @@ function RotatableProfileCard({
   onThemeChange,
 }) {
   const prefersReducedMotion = useReducedMotion();
-  const [rotation, setRotation] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const dragStartRef = useRef({ x: 0, y: 0 });
-  const dragDistanceRef = useRef(0);
-
-  function handlePointerDown(e) {
-    if (prefersReducedMotion || e.button !== 0) return;
-    setIsDragging(true);
-    dragStartRef.current = { x: e.clientX, y: e.clientY };
-    dragDistanceRef.current = 0;
-  }
-
-  function handlePointerMove(e) {
-    if (!isDragging) return;
-    const deltaX = e.clientX - dragStartRef.current.x;
-    const deltaY = e.clientY - dragStartRef.current.y;
-    dragDistanceRef.current += Math.abs(deltaX) + Math.abs(deltaY);
-    dragStartRef.current = { x: e.clientX, y: e.clientY };
-
-    // Accumulate rotation freely beyond 360 degrees
-    setRotation((prev) => ({
-      x: prev.x - deltaY * 0.45,
-      y: prev.y + deltaX * 0.45,
-    }));
-  }
-
-  function handlePointerUp() {
-    setIsDragging(false);
-  }
-
-  function handleClick() {
-    // Prevent accidental selection if the user was dragging to rotate (threshold of 6px)
-    if (dragDistanceRef.current < 6) {
-      onSelect(profile.slug || profile.id);
-    }
-  }
-
-  function handleReset(e) {
-    e.stopPropagation();
-    setRotation({ x: 0, y: 0 });
-  }
-
-  const hasRotated = Math.abs(rotation.x) > 1 || Math.abs(rotation.y) > 1;
 
   return (
-    <div
-      className="profile-card-container"
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerUp}
+    <LiquidGlassCard
+      as="article"
+      className="profile-card"
+      hoverTilt={4}
+      floating
+      floatDuration={7 + index * 0.55}
+      floatDelay={-index * 1.25}
+      idleRotation={index % 2 === 0 ? 0.28 : -0.28}
+      highlightIntensity={0.25}
+      selected={isSelected}
+      motionProps={{
+        initial: { opacity: 0, y: prefersReducedMotion ? 0 : 16 },
+        animate: { opacity: 1, y: 0 },
+        transition: {
+          duration: prefersReducedMotion ? 0.01 : 0.35,
+          delay: prefersReducedMotion ? 0 : index * 0.07,
+        },
+      }}
     >
-      <div
-        className={`profile-card-3d-wrapper${isDragging ? " is-dragging" : ""}`}
-        style={{
-          transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
-        }}
+      <button
+        className="profile-select"
+        type="button"
+        aria-pressed={isSelected}
+        onClick={() => onSelect(profile.slug || profile.id)}
       >
-        <LiquidGlassCard
-          as="article"
-          className="profile-card"
-          hoverTilt={hasRotated ? 0 : 4}
-          floating={!hasRotated}
-          floatDuration={7 + index * 0.55}
-          floatDelay={-index * 1.25}
-          idleRotation={index % 2 === 0 ? 0.28 : -0.28}
-          highlightIntensity={0.25}
-          selected={isSelected}
-          motionProps={{
-            initial: { opacity: 0, y: prefersReducedMotion ? 0 : 16 },
-            animate: { opacity: 1, y: 0 },
-            transition: {
-              duration: prefersReducedMotion ? 0.01 : 0.35,
-              delay: prefersReducedMotion ? 0 : index * 0.07,
-            },
-          }}
-        >
-          {hasRotated && (
-            <button
-              className="rotation-reset-button"
-              type="button"
-              aria-label="Reset 3D view"
-              title="Reset 360° view"
-              onClick={handleReset}
-            >
-              <RotateCcw size={12} />
-            </button>
-          )}
+        <span className="profile-check" aria-hidden="true"><Check size={16} /></span>
+        <ProfileAvatar profile={profile} />
+        <span className="profile-name">{profile.name}</span>
+      </button>
 
-          <button
-            className="profile-select"
-            type="button"
-            aria-pressed={isSelected}
-            onClick={handleClick}
-          >
-            <span className="profile-check" aria-hidden="true"><Check size={16} /></span>
-            <ProfileAvatar profile={profile} />
-            <span className="profile-name">{profile.name}</span>
-          </button>
-
-          <span className="rotation-indicator" aria-hidden="true">
-            {hasRotated ? `${Math.round(rotation.y)}°` : "drag to rotate 360°"}
-          </span>
-
-          {isEditing && (
-            <div className="profile-edit-controls">
-              <label className="profile-name-label" htmlFor={`profile-name-${profile.id}`}>
-                Display name
-              </label>
-              <input
-                id={`profile-name-${profile.id}`}
-                type="text"
-                maxLength={28}
-                value={profile.name}
-                onChange={(event) => onNameChange(profile.id, event.target.value)}
+      {isEditing && (
+        <div className="profile-edit-controls">
+          <label className="profile-name-label" htmlFor={`profile-name-${profile.id}`}>
+            Display name
+          </label>
+          <input
+            id={`profile-name-${profile.id}`}
+            type="text"
+            maxLength={28}
+            value={profile.name}
+            onChange={(event) => onNameChange(profile.id, event.target.value)}
+          />
+          <span className="profile-name-label">Visual theme</span>
+          <div className="theme-options" role="group" aria-label={`Visual theme for ${profile.name}`}>
+            {profileThemes.map((theme) => (
+              <button
+                className={`theme-swatch${profile.theme === theme.id ? " is-active" : ""}`}
+                key={theme.id}
+                type="button"
+                style={{ "--swatch": theme.color }}
+                aria-label={`Set ${theme.label} theme for ${profile.name}`}
+                aria-pressed={profile.theme === theme.id}
+                onClick={() => onThemeChange(profile.id, theme.id)}
               />
-              <span className="profile-name-label">Visual theme</span>
-              <div className="theme-options" role="group" aria-label={`Visual theme for ${profile.name}`}>
-                {profileThemes.map((theme) => (
-                  <button
-                    className={`theme-swatch${profile.theme === theme.id ? " is-active" : ""}`}
-                    key={theme.id}
-                    type="button"
-                    style={{ "--swatch": theme.color }}
-                    aria-label={`Set ${theme.label} theme for ${profile.name}`}
-                    aria-pressed={profile.theme === theme.id}
-                    onClick={() => onThemeChange(profile.id, theme.id)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-        </LiquidGlassCard>
-      </div>
-    </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </LiquidGlassCard>
   );
 }
 
 // -------------------------------------------------------------
-// PROFILE AVATAR with Dimensional Orbit Layers
+// PROFILE AVATAR with Dimensional Orbit Layers (No human silhouette)
 // -------------------------------------------------------------
 function ProfileAvatar({ profile }) {
-  const themeClass = profile.theme || ({ software: "ember", security: "ice", projects: "copper", all: "aurora" }[profile.slug || profile.id] || "aurora");
+  const themeClass = profile.theme || ({ software: "burgundy", security: "wine", projects: "garnet", all: "crimson" }[profile.slug || profile.id] || "burgundy");
   return (
     <span className={`avatar-scene theme-${themeClass}`} aria-hidden="true" style={{ "--profile-accent": profile.accentColor }}>
       <span className="avatar-halo" />
       <span className="avatar-orbit" />
       <span className="avatar-core">
-        <span className="avatar-face" />
-        <span className="avatar-mark">{profile.mark || profile.icon || profile.name?.slice(0, 2).toUpperCase()}</span>
+        <span className="avatar-mark">{profile.mark || profile.name?.slice(0, 2).toUpperCase()}</span>
       </span>
       <span className="avatar-shadow" />
     </span>
@@ -313,7 +237,7 @@ function ProfileAvatar({ profile }) {
 // -------------------------------------------------------------
 // SHELF CARD FOR PROJECTS, RESUMES, CERTIFICATIONS
 // -------------------------------------------------------------
-function ShelfCard({ title, meta, icon: Icon, image, artTheme = "default", onClick, actionButton, onEdit, onDelete }) {
+function ShelfCard({ title, meta, badgeText, icon: Icon, image, artTheme = "default", onClick, actionButton, onEdit, onDelete }) {
   return (
     <LiquidGlassCard as="article" className="shelf-card" hoverTilt={4} highlightIntensity={0.16}>
       <button className="shelf-card-open" type="button" onClick={onClick} aria-label={`Open ${title}`}>
@@ -326,7 +250,10 @@ function ShelfCard({ title, meta, icon: Icon, image, artTheme = "default", onCli
           <span className="shelf-art-shine" />
         </span>
         <span className="shelf-card-title">{title}</span>
-        {meta && <span className="shelf-card-meta">{meta}</span>}
+        <div className="shelf-card-meta-row">
+          {meta && <span className="shelf-card-meta">{meta}</span>}
+          {badgeText && <span className="shelf-card-badge">{badgeText}</span>}
+        </div>
       </button>
       {actionButton && (
         <div style={{ padding: "0 14px 14px", display: "flex", justifyContent: "flex-start" }}>
@@ -416,7 +343,7 @@ function ProfileSelection({
         <div className="profile-intro">
           <span className="profile-kicker">A SPACE FOR EVERY SIDE</span>
           <h1 id="profile-heading">Who's exploring?</h1>
-          <p>Choose a profile to enter · Drag objects to rotate in 360° 3D</p>
+          <p>Choose a profile to enter your personalised portfolio view</p>
         </div>
 
         <div className="profile-grid" role="group" aria-label="Choose a browsing profile">
@@ -424,7 +351,7 @@ function ProfileSelection({
             const isSelected = selectedProfileId === (profile.slug || profile.id);
 
             return (
-              <RotatableProfileCard
+              <ProfileCard
                 key={profile.id || profile.slug}
                 profile={profile}
                 index={index}
@@ -618,7 +545,7 @@ export default function App() {
 
           <main>
             {/* ============================================================ */}
-            {/* 1. SUMMARY SECTION (Cinematic Hero with Liquid Glass Sculpture) */}
+            {/* 1. SUMMARY SECTION (Cinematic Hero with Abstract Artwork)    */}
             {/* ============================================================ */}
             <section className="hero summary-hero" id="summary" aria-labelledby="summary-title">
               <div className="hero-glow" />
@@ -636,7 +563,7 @@ export default function App() {
                 </p>
 
                 {activeSummary.highlights && (
-                  <div className="interest-tags" style={{ margin: "14px 0 20px" }}>
+                  <div className="interest-tags" style={{ margin: "16px 0 24px" }}>
                     {activeSummary.highlights.map((h) => (
                       <span className="interest-tag" key={h.label}>
                         <strong>{h.label}:</strong> {h.value}
@@ -645,6 +572,15 @@ export default function App() {
                   </div>
                 )}
 
+                <div className="hero-actions">
+                  <a className="button button-primary" href="#projects">
+                    Explore My Work <ArrowRight size={15} />
+                  </a>
+                  <a className="button button-secondary" href="#contact">
+                    About Me
+                  </a>
+                </div>
+
                 <div className="hero-footnote">
                   <span>SUMMARY</span>
                   <span>PROJECTS</span>
@@ -652,28 +588,50 @@ export default function App() {
                 </div>
               </div>
 
-              {/* 3D Liquid Glass Orb Hero Visual */}
-              <div className="hero-visual" aria-label="3D Liquid-glass sculpture">
-                <div className="visual-ring ring-a" />
-                <div className="visual-ring ring-b" />
-                <div className="visual-orb">
-                  <div className="orb-core" />
-                  <div className="orb-loop loop-a" />
-                  <div className="orb-loop loop-b" />
-                  <span className="orb-node node-a" />
-                  <span className="orb-node node-b" />
-                  <span className="orb-node node-c" />
-                  <span className="orb-node node-d" />
-                </div>
-                <div className="float-panel float-top">
-                  <Sparkles size={18} />
-                  <span><b>SAMVES</b><small>Portfolio</small></span>
-                </div>
-                <div className="float-panel float-bottom">
-                  <Code2 size={18} />
-                  <span><b>{selectedProfile.name}</b><small>Selected Profile</small></span>
-                </div>
-                <span className="visual-caption">PERSONAL PORTFOLIO</span>
+              {/* Spacious Visual Area (Abstract Burgundy Artwork or Configured Media Slot) */}
+              <div className="hero-visual" aria-label="Visual artwork">
+                {heroConfig.media?.src ? (
+                  heroConfig.media.type === "video" ? (
+                    <video
+                      className="hero-media-element"
+                      src={heroConfig.media.src}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                    />
+                  ) : (
+                    <img
+                      className="hero-media-element"
+                      src={heroConfig.media.src}
+                      alt={heroConfig.media.alt || "Hero visual"}
+                    />
+                  )
+                ) : (
+                  <div className="abstract-hero-sculpture">
+                    <div className="atmospheric-aura" />
+                    <div className="visual-ring ring-a" />
+                    <div className="visual-ring ring-b" />
+                    <div className="visual-orb">
+                      <div className="orb-core" />
+                      <div className="orb-loop loop-a" />
+                      <div className="orb-loop loop-b" />
+                      <span className="orb-node node-a" />
+                      <span className="orb-node node-b" />
+                      <span className="orb-node node-c" />
+                      <span className="orb-node node-d" />
+                    </div>
+                    <div className="float-panel float-top">
+                      <Sparkles size={16} />
+                      <span><b>SAMVES</b><small>Cinematic Portfolio</small></span>
+                    </div>
+                    <div className="float-panel float-bottom">
+                      <Code2 size={16} />
+                      <span><b>{selectedProfile.name}</b><small>Active Discipline</small></span>
+                    </div>
+                    <span className="visual-caption">CINEMATIC INTERFACE</span>
+                  </div>
+                )}
               </div>
               <a className="scroll-cue" href="#projects"><ArrowDown size={15} /> View projects</a>
             </section>
@@ -723,6 +681,7 @@ export default function App() {
                                 key={project.id}
                                 title={project.title}
                                 meta={Array.isArray(project.technologies) ? project.technologies.slice(0, 2).join(" · ") : ""}
+                                badgeText={project.status}
                                 icon={category.id === "cybersecurity" ? ShieldCheck : Code2}
                                 artTheme={category.id === "cybersecurity" ? "security" : "software"}
                                 image={project.image}
@@ -853,73 +812,116 @@ export default function App() {
             {/* 6. CONTACT / ABOUT SECTION (Final Primary Section)          */}
             {/* ============================================================ */}
             <section className="portfolio-section contact-section" id="contact" aria-labelledby="contact-title">
+              <span id="about" style={{ display: "block", position: "relative", top: "-90px", visibility: "hidden" }} />
               <div className="section-title-row">
                 <div>
-                  <span className="eyebrow">RECRUITER OUTREACH</span>
+                  <span className="eyebrow">RECRUITER OUTREACH & DOSSIER</span>
                   <h2 id="contact-title">Contact / About<span className="accent">.</span></h2>
                 </div>
               </div>
 
-              <div className="contact-grid">
-                {/* About Profile Summary */}
-                <div className="contact-card">
-                  <h3>About the Engineer</h3>
-                  <p className="contact-bio">{contactDetails.shortBio}</p>
-                  <div>
-                    <h4 style={{ margin: "0 0 10px", fontSize: "12px", color: "#c8b9d6" }}>Key Interests</h4>
-                    <div className="interest-tags">
-                      {contactDetails.interests.map((interest) => (
-                        <span className="interest-tag" key={interest}>{interest}</span>
-                      ))}
+              <div className="contact-editorial-layout">
+                {/* Left Column: Abstract Visual Panel or Future Media Slot (Hidden if empty) */}
+                <div className="about-visual-panel">
+                  {contactDetails.mediaSlot?.src ? (
+                    contactDetails.mediaSlot.type === "video" ? (
+                      <video
+                        className="about-media-element"
+                        src={contactDetails.mediaSlot.src}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                      />
+                    ) : (
+                      <img
+                        className="about-media-element"
+                        src={contactDetails.mediaSlot.src}
+                        alt={contactDetails.mediaSlot.alt || "Engineer portrait"}
+                      />
+                    )
+                  ) : (
+                    <div className="about-abstract-panel">
+                      <div className="about-abstract-glow" />
+                      <div className="about-abstract-lattice" />
+                      <div className="about-abstract-mark">SAMVES<span>.</span></div>
+                      <div className="about-abstract-tag">[ 01 / EDITORIAL DOSSIER ]</div>
+                      <div className="about-abstract-quote">
+                        Engineered for resilience, precision, and architectural clarity.
+                      </div>
                     </div>
-                  </div>
-                  <div style={{ fontSize: "12px", color: "#a597b3" }}>
-                    <span>Status: <strong>{contactDetails.status}</strong></span>
-                    <br />
-                    <span>Location: {contactDetails.location}</span>
-                  </div>
+                  )}
                 </div>
 
-                {/* Outreach Channels */}
-                <div className="contact-card">
-                  <h3>Direct Channels</h3>
-                  <div className="contact-channels">
-                    {contactDetails.email && (
-                      <a className="contact-channel-item" href={`mailto:${contactDetails.email}`}>
-                        <div className="contact-channel-left">
-                          <Mail size={16} />
-                          <span>Email: {contactDetails.email}</span>
-                        </div>
-                        <ExternalLink size={13} />
-                      </a>
-                    )}
-                    {contactDetails.links.github && (
-                      <a className="contact-channel-item" href={contactDetails.links.github} target="_blank" rel="noopener noreferrer">
-                        <div className="contact-channel-left">
-                          <Github size={16} />
-                          <span>GitHub Profile</span>
-                        </div>
-                        <ExternalLink size={13} />
-                      </a>
-                    )}
-                    {contactDetails.links.linkedin && (
-                      <a className="contact-channel-item" href={contactDetails.links.linkedin} target="_blank" rel="noopener noreferrer">
-                        <div className="contact-channel-left">
-                          <Linkedin size={16} />
-                          <span>LinkedIn Connection</span>
-                        </div>
-                        <ExternalLink size={13} />
-                      </a>
-                    )}
-                    {contactDetails.links.portfolio && (
-                      <a className="contact-channel-item" href={contactDetails.links.portfolio} target="_blank" rel="noopener noreferrer">
-                        <div className="contact-channel-left">
-                          <Globe size={16} />
-                          <span>Personal Site</span>
-                        </div>
-                        <ExternalLink size={13} />
-                      </a>
-                    )}
+                {/* Right Column: Biography, Interests & Direct Verified Channels */}
+                <div className="about-content-column">
+                  <div className="contact-card">
+                    <h3>About the Engineer</h3>
+                    <p className="contact-bio">{contactDetails.shortBio}</p>
+                    <div>
+                      <h4 style={{ margin: "0 0 10px", fontSize: "12px", color: "#d896a8" }}>Key Interests</h4>
+                      <div className="interest-tags">
+                        {contactDetails.interests.map((interest) => (
+                          <span className="interest-tag" key={interest}>{interest}</span>
+                        ))}
+                      </div>
+                    </div>
+                    <div style={{ fontSize: "12px", color: "#a597a8", marginTop: "16px" }}>
+                      <span>Status: <strong>{contactDetails.status}</strong></span>
+                      <br />
+                      <span>Location: {contactDetails.location}</span>
+                    </div>
+                  </div>
+
+                  <div className="contact-card">
+                    <h3>Direct Channels</h3>
+                    <div className="contact-channels">
+                      {contactDetails.email ? (
+                        <a className="contact-channel-item" href={`mailto:${contactDetails.email}`}>
+                          <div className="contact-channel-left">
+                            <Mail size={16} />
+                            <span>Email: {contactDetails.email}</span>
+                          </div>
+                          <ExternalLink size={13} />
+                        </a>
+                      ) : null}
+
+                      {contactDetails.links.github ? (
+                        <a className="contact-channel-item" href={contactDetails.links.github} target="_blank" rel="noopener noreferrer">
+                          <div className="contact-channel-left">
+                            <Github size={16} />
+                            <span>GitHub Profile</span>
+                          </div>
+                          <ExternalLink size={13} />
+                        </a>
+                      ) : null}
+
+                      {contactDetails.links.linkedin ? (
+                        <a className="contact-channel-item" href={contactDetails.links.linkedin} target="_blank" rel="noopener noreferrer">
+                          <div className="contact-channel-left">
+                            <Linkedin size={16} />
+                            <span>LinkedIn Connection</span>
+                          </div>
+                          <ExternalLink size={13} />
+                        </a>
+                      ) : null}
+
+                      {contactDetails.links.portfolio ? (
+                        <a className="contact-channel-item" href={contactDetails.links.portfolio} target="_blank" rel="noopener noreferrer">
+                          <div className="contact-channel-left">
+                            <Globe size={16} />
+                            <span>Personal Site</span>
+                          </div>
+                          <ExternalLink size={13} />
+                        </a>
+                      ) : null}
+
+                      {!contactDetails.email && !contactDetails.links.linkedin && (
+                        <p style={{ margin: "6px 0 0", fontSize: "11px", color: "#8a7e8e" }}>
+                          Verified direct channels. Additional contacts can be configured in <code>src/data/contact.js</code>.
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

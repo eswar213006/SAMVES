@@ -7,9 +7,9 @@ export const initialProfiles = [
     slug: "software",
     name: "Software Development",
     roleLabel: "Full-Stack & Software Engineering",
-    theme: "ember",
-    mark: "🧑‍💻",
-    accentColor: "#f35d70",
+    theme: "burgundy",
+    mark: "◈",
+    accentColor: "#a81e38",
     description: "Modern web applications, scalable software architectures, and algorithmic problem solving."
   },
   {
@@ -17,9 +17,9 @@ export const initialProfiles = [
     slug: "security",
     name: "Cybersecurity",
     roleLabel: "Security Analysis & Defense",
-    theme: "ice",
+    theme: "wine",
     mark: "🛡️",
-    accentColor: "#6bc4d2",
+    accentColor: "#7e1529",
     description: "Security assessments, vulnerability research, defensive systems, and secure coding practices."
   },
   {
@@ -27,9 +27,9 @@ export const initialProfiles = [
     slug: "projects",
     name: "Projects",
     roleLabel: "Technical Project Showcase",
-    theme: "copper",
-    mark: "🧑‍🚀",
-    accentColor: "#e3a365",
+    theme: "garnet",
+    mark: "⚡",
+    accentColor: "#9c243b",
     description: "Curated collection across all software development and cybersecurity engineering works."
   },
   {
@@ -37,17 +37,18 @@ export const initialProfiles = [
     slug: "all",
     name: "All Access",
     roleLabel: "Complete Engineering Portfolio",
-    theme: "aurora",
-    mark: "🤖",
-    accentColor: "#a99be9",
+    theme: "crimson",
+    mark: "✦",
+    accentColor: "#bf2a48",
     description: "Full access to all engineering tracks, practice logs, credentials, and achievements.",
     isAllAccess: true
   }
 ];
 
 export const profileThemes = [
-  { id: "ember", label: "Ember", color: "#f35d70" },
-  { id: "ice", label: "Ice", color: "#6bc4d2" },
-  { id: "copper", label: "Copper", color: "#e3a365" },
-  { id: "aurora", label: "Aurora", color: "#a99be9" }
+  { id: "burgundy", label: "Burgundy", color: "#a81e38" },
+  { id: "wine", label: "Wine", color: "#7e1529" },
+  { id: "garnet", label: "Garnet", color: "#9c243b" },
+  { id: "crimson", label: "Crimson", color: "#bf2a48" }
 ];
+

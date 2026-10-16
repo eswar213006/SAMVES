@@ -23,10 +23,11 @@ export const projects = [
   {
     id: "samves-portfolio",
     categoryId: "software-development",
-    title: "SAMVES Portfolio Architecture",
-    description: "A dark Neo Glass recruiter portfolio featuring 360-degree interactive 3D rotation, real-time lighting physics, and role-based filtering.",
-    technologies: ["React 19", "Vite", "Framer Motion", "Vanilla CSS", "3D Transforms"],
-    githubUrl: "https://github.com",
+    title: "SAMVES Cinematic Portfolio Architecture",
+    description: "A dark editorial portfolio featuring near-black glass surfaces, burgundy atmospheric lighting, role-based recruiter views, and fluid responsive interactions.",
+    status: "Product", // "Product" | "Prototype" | "In Development"
+    technologies: ["React 19", "Vite", "Framer Motion", "Vanilla CSS", "Neo Glass"],
+    githubUrl: "https://github.com/eswar213006/SAMVES",
     demoUrl: "",
     image: null,
     assignedRoles: ["software", "projects", "all"]
@@ -36,8 +37,9 @@ export const projects = [
     categoryId: "cybersecurity",
     title: "Automated Security Audit & Hardening",
     description: "Scripted environment scanning and policy validation toolkit for Linux systems to inspect permissions, open ports, and configuration drift.",
+    status: "Prototype",
     technologies: ["Bash", "Python", "Linux Security", "Network Auditing"],
-    githubUrl: "https://github.com",
+    githubUrl: "",
     demoUrl: "",
     image: null,
     assignedRoles: ["security", "projects", "all"]

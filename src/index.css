@@ -4,15 +4,21 @@
 :root {
   font-family: "DM Sans", sans-serif;
   color: #f5f5f7;
-  background: #090a0e;
+  background: #050505;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  --background: #090a0e;
-  --text-secondary: #a0a0ad;
-  --accent: #ed5265;
-  --border: rgba(255, 255, 255, 0.09);
+  --background: #050505;
+  --text-primary: #f9fafb;
+  --text-secondary: #9ca3af;
+  --accent: #8e172f;
+  --accent-light: #b42240;
+  --accent-deep: #4e0a19;
+  --accent-glow: rgba(142, 23, 47, 0.28);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-accent: rgba(142, 23, 47, 0.32);
 }
+
 
 * {
   box-sizing: border-box;

@@ -43,3 +43,16 @@ export const summaries = {
     ]
   }
 };
+
+// Configurable Hero Media Slot
+// To replace the abstract artwork with your portrait or silent video in the future,
+// simply set `src: "/assets/portrait.jpg"` or `src: "/assets/hero.mp4"` and set `type: "image"` or `"video"`.
+// When `src` is empty or type is "abstract", the cinematic abstract burgundy artwork renders automatically.
+export const heroConfig = {
+  media: {
+    type: "abstract", // "abstract" | "image" | "video"
+    src: "",
+    alt: "Cinematic Visual Artwork"
+  }
+};
+
